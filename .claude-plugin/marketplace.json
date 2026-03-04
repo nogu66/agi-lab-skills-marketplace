@@ -13,7 +13,7 @@
       "name": "terminal-vibes",
       "source": "./plugins/terminal-vibes",
       "description": "Spinning ASCII donuts, cat art, dad jokes, and Matrix rain. Pure terminal fun, no API keys needed.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "fun",
       "tags": ["entertainment", "ascii-art", "terminal", "break-time"]
     }
