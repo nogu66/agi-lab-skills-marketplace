@@ -1,6 +1,6 @@
 {
   "name": "tech-deep-dive",
-  "description": "特定の技術テーマに関するマルチソース調査を自律的に実行し、技術理解レポート・実装ガイド・ブログ記事・チュートリアル・コードサンプル・プレゼンスライドを一度に生成するスキル。",
+  "description": "技術テーマのマルチソース調査・分析・コンテンツ生成を行う3スキルセット（tech-deep-dive / tech-content-gen / tech-research-suite）。単体でも組み合わせでも使用可能。",
   "version": "0.1.0",
   "author": {
     "name": "nogu",
