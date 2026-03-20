@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "AGIラボの plugin 集と、ハッカソン参加者向け starter template。",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "plugins": [
     {
@@ -18,12 +18,12 @@
       "tags": ["starter", "template", "hackathon", "marketplace"]
     },
     {
-      "name": "terminal-vibes",
-      "source": "./plugins/terminal-vibes",
-      "description": "Spinning ASCII donuts, cat art, dad jokes, and Matrix rain. Pure terminal fun, no API keys needed.",
-      "version": "1.1.0",
-      "category": "fun",
-      "tags": ["entertainment", "ascii-art", "terminal", "break-time"]
+      "name": "tech-deep-dive",
+      "source": "./plugins/tech-deep-dive",
+      "description": "技術テーマのマルチソース調査・分析・コンテンツ生成を行う3スキルセット（tech-deep-dive / tech-content-gen / tech-research-suite）。",
+      "version": "0.1.0",
+      "category": "research",
+      "tags": ["research", "tech-deep-dive", "autonomous", "multi-source"]
     }
   ]
 }
