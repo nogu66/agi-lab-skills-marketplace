@@ -1,5 +1,5 @@
 {
-  "name": "agi-lab-skills",
+  "name": "deep-dive-lab",
   "owner": {
     "name": "AGI Lab",
     "email": "kai@tempi.co.jp"
@@ -20,7 +20,7 @@
     {
       "name": "tech-deep-dive",
       "source": "./plugins/tech-deep-dive",
-      "description": "技術テーマのマルチソース調査・分析・コンテンツ生成を行う3スキルセット（tech-deep-dive / tech-content-gen / tech-research-suite）。",
+      "description": "技術テーマのマルチソース調査から、レポート・実装ガイド・コードサンプル・ブログ記事・チュートリアル・スライドまで一括生成する統合スキル。",
       "version": "0.1.0",
       "category": "research",
       "tags": ["research", "tech-deep-dive", "autonomous", "multi-source"]
