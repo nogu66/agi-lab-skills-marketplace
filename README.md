@@ -1,174 +1,137 @@
-# AGI Lab Skills Marketplace
+# tech-deep-dive
 
-AGIラボの plugin 集兼、AIエージェントハッカソン参加者向けの starter repo です。
+技術テーマのマルチソース調査・分析・コンテンツ生成を行う 3 スキルセット（`tech-deep-dive` / `tech-content-gen` / `tech-research-suite`）。単体でも組み合わせでも使用できます。
 
-この repo では 2 つの使い方があります。
+## 使い方（概要）
 
-1. AGIラボの既存 plugin をインストールして試す
-2. `plugins/hackathon-starter/` を土台にして、自分の作品をそのまま提出できる形に育てる
+| やりたいこと | 使うスキル | 目安 |
+|--------------|------------|------|
+| 調査だけ先に済ませたい（レポート・実装ガイド・サンプルコードまで） | `tech-deep-dive` | テーマを一文で指定すれば開始できる |
+| 既にある調査結果を記事・チュートリアル・スライドにしたい | `tech-content-gen` | 対象の `research/...` フォルダが必要 |
+| 調査から外向きの資料まで一気に欲しい | `tech-research-suite` | 時間・トークンは最大になる |
 
-この README は、特に 2 の「ハッカソン参加者が迷わず提出まで進めること」を優先して書いています。
+**プロンプトに含めるとよいこと（任意だが精度が上がる）**
 
-## ハッカソン参加者はここから
+- **テーマ**: 何について知りたいか（例: 「Rust の async ランタイム比較」）
+- **目的**: キャッチアップ / 導入判断 / 勉強会資料 など
+- **範囲**: 含めたい・除外したいもの（例: 「プロダクション運用の観点は必須、歴史背景は短く」）
+- **コンテンツ系のみ**: 想定読者（初心者向け／社内エンジニア向け 等）
 
-やることはシンプルです。
+**出力フォルダの規則**
 
-1. この repo を fork する
-2. `plugins/hackathon-starter/` を自分の作品に合わせて書き換える
-3. README を「何ができる plugin か」がすぐ伝わる形に直す
-4. GitHub で公開して、デモ動画と一緒に提出する
+- すべて `research/{YYYY-MM-DD}_{テーマ名のケバブケース}/` にまとまります（日付は実行日、`{テーマ名}` は英語のケバブケースが目安）。
+- `tech-content-gen` は **同じフォルダに追記**します。フォルダを指定しない場合は **最新の `research/` 配下**が使われます。意図した調査結果で記事化したいときは、**パスを明示**してください（例: `research/2025-03-21_rust-async-runtimes/`）。
 
-難しい仕組みを増やす必要はありません。
-まずは `1つの仕事を終わらせる skill` を、他の人が試せる形で置ければ十分です。
+**スライド（`presentation.pptx`）について**
 
-## 提出までの一本道
+- `tech-content-gen` / `tech-research-suite` は、環境に **pptx 生成スキル**（`/pptx` 等）がある前提でスライドを作成します。**利用できない場合はスライドはスキップ**され、その旨が伝わる想定です。ブログ・チュートリアルは通常どおり生成されます。
 
-### 1. 何を作るかを 1 行で決める
+詳細なワークフロー・テンプレートは `plugins/tech-deep-dive/skills/*/SKILL.md` および各 `references/` を参照してください。
 
-最初に決めるのは「誰の、どんな面倒を減らす skill なのか」です。
+## スキル一覧
 
-例:
+### tech-deep-dive（調査・分析）
 
-- 営業後の議事メモから、次回提案メールの下書きを自動で作る
-- Discord の未回答質問を集めて、優先度付きで整理する
-- 毎朝のタスクと予定を見て、その日の実行順を提案する
+出力先: `research/{YYYY-MM-DD}_{テーマ名}/`（`research/` が無ければ作成）
 
-### 2. starter の中身を自分の作品に置き換える
+成果物:
 
-最低限、以下を直せば提出の土台になります。
+| ファイル | 内容 |
+|----------|------|
+| `technical_report.md` | 技術理解レポート（3,000〜8,000 語以上を目安） |
+| `implementation_guide.md` | 実装応用ガイド（3,000〜6,000 語以上を目安） |
+| `samples/` | コードサンプル集（最低 3 つの動作するサンプル） |
 
-- `plugins/hackathon-starter/skills/starter-guide/SKILL.md`
-  - 自分の skill の説明、トリガー、入出力、ルールに書き換える
-- `plugins/hackathon-starter/.claude-plugin/plugin.json`
-  - plugin 名と説明文を自分の作品に合わせる
-- `.claude-plugin/marketplace.json`
-  - marketplace の説明と plugin 一覧を自分の提出内容に合わせる
+特定の技術テーマに関するマルチソース（arXiv、GitHub、技術ブログ、公式ドキュメント等）調査を自律的に実行し、技術理解レポート・実装応用ガイド・コードサンプル集を生成します。「〇〇について調査して」「〇〇の技術深掘りして」「tech-deep-dive で △△ を調べて」のような指示で発火します。技術キャッチアップ、競合調査、導入検討に使います。
 
-時間がなければ、フォルダ名まできれいに変えなくても構いません。
-まずは `install できる`、`説明が読める`、`動きが分かる` 状態を優先してください。
+**処理の流れ（要約）**: Web 上の複数ソースを調査 → `technical_report.md` → `implementation_guide.md` → `samples/`（最低 3 サンプル）。完了時に出力フォルダのパスと概要が示されます。
 
-### 3. README を提出用に整える
+### tech-content-gen（コンテンツ生成）
 
-README には、少なくとも次の 4 点があると迷いません。
+`tech-deep-dive` の調査結果を元に、ブログ記事・ハンズオンチュートリアル・プレゼンスライドを生成します。「調査結果をブログにして」「チュートリアルを作って」「スライドにまとめて」「tech-content-gen で共有資料を作って」のような指示で発火します。調査結果の共有・発信に使います。
 
-1. この plugin が何をしてくれるか
-2. どうやってインストールするか
-3. どういう入力で呼ぶと、何が返るか
-4. デモ動画やスクリーンショットへの導線
+前提: 対象の `research/` 配下フォルダを特定する。未指定なら最新の `research/` を使用。`technical_report.md` と `implementation_guide.md` を入力とする。
 
-審査する側は、README を読んですぐ試せるかをかなり見ます。
+成果物:
 
-### 4. 公開 GitHub repo とデモ動画を用意する
+| ファイル | 内容 |
+|----------|------|
+| `blog_article.md` | Qiita / Zenn レベルの技術記事（2,000〜5,000 語以上を目安） |
+| `tutorial.md` | ステップバイステップのハンズオン（2,000〜4,000 語以上を目安） |
+| `presentation.pptx` | 社内共有・勉強会用スライド（15〜25 枚を目安） |
 
-提出時に最低限あるとよいものは次のとおりです。
+出力先: 上記と同じ `research/{YYYY-MM-DD}_{テーマ名}/` に追記
 
-- 公開 GitHub repo
-- plugin 1 つ
-- 分かりやすい `SKILL.md` 1 つ
-- README
-- 3 分以内のデモ動画
+**処理の流れ（要約）**: 指定フォルダの `technical_report.md` と `implementation_guide.md` を読む → `blog_article.md` → `tutorial.md`（`samples/` があれば活用）→ `presentation.pptx`（pptx スキル不可時はスキップの可能性あり）。
 
-これで十分に提出できます。
+### tech-research-suite（一括実行）
 
-## まず触るファイル
+技術テーマの調査から共有資料の作成まで一括で実行するオーケストレーションです。`tech-deep-dive` と `tech-content-gen` を順に実行し、レポート・実装ガイド・コードサンプル・ブログ記事・チュートリアル・スライドの 6 成果物を一度に生成します。「〇〇について全部まとめて」「フルリサーチして」「tech-research-suite で △△ を調査して」のような指示で発火します。
 
-### `.claude-plugin/marketplace.json`
+**処理の流れ（要約）**: まず `tech-deep-dive` と同じ成果物を同一フォルダに生成 → 続けて `tech-content-gen` で同フォルダに 3 ファイルを追記。途中で止めたい場合は、代わりにスキルを分けて実行してください。
 
-repo 全体の marketplace 情報です。
-審査側が install するときの marketplace 名や、plugin 一覧がここに入ります。
+最終出力（同一フォルダ）:
 
-### `plugins/hackathon-starter/.claude-plugin/plugin.json`
-
-plugin 単位の名前と説明です。
-README を読む前に、この説明が一覧で見られることがあります。
-
-### `plugins/hackathon-starter/skills/starter-guide/SKILL.md`
-
-この repo の核です。
-最初は starter ですが、提出時にはここを自分の skill に置き換える前提です。
-
-### `README.md`
-
-審査側と他の参加者が最初に読む入口です。
-長くしすぎるより、「何ができるか」「どう試すか」がすぐ分かる方が強いです。
-
-## 審査する側が最初に見ること
-
-多くの場合、最初に確認されるのは次の流れです。
-
-```bash
-/plugin marketplace add <your-github-user>/<your-repo>
-/plugin install <your-plugin-name>@<your-marketplace-name>
+```
+research/{YYYY-MM-DD}_{テーマ名}/
+  technical_report.md
+  implementation_guide.md
+  samples/
+  blog_article.md
+  tutorial.md
+  presentation.pptx
 ```
 
-ここで install できて、README を読めば使い方が分かる状態だと、作品の良さが伝わりやすくなります。
+## 共通の制約（各スキル）
 
-## 最低限これなら提出できる
+- 成果物は**日本語**（技術用語・固有名詞等は英語表記を維持し、必要なら括弧で補足）
+- **絵文字は使わない**
+- コード内コメントは**日本語**
 
-次の条件を満たしていれば、十分提出ラインです。
+## Claude Code でのインストールと起動例
 
-- public な GitHub repo がある
-- plugin が 1 つ入っている
-- `SKILL.md` が自分の作品内容に置き換わっている
-- README にセットアップと使い方が書いてある
-- デモ動画がある
-
-大きなフレームワークや複雑な構成は必須ではありません。
-まずは 1 つの体験を、最後まで試せる形で完成させるのが最優先です。
-
-## 既存 plugin を試したい人へ
-
-この repo は marketplace としても使えます。
+marketplace 名は **agi-lab-skills** です。`<owner>/<repo>` はホストしているリポジトリに読み替えてください。
 
 ```bash
-# In Claude Code
-/plugin marketplace add nogu66/agi-lab-skills-marketplace
+/plugin marketplace add <owner>/<repo>
 /plugin install tech-deep-dive@agi-lab-skills
 ```
 
-## 収録 plugin
+インストール後、通常のチャットで **スキル名ややりたいことを自然文で書く**と、該当スキルの説明（`description`）にマッチして利用されます。次のような言い方がそのまま使えます。
 
-### hackathon-starter
+**調査のみ（`tech-deep-dive`）**
 
-ハッカソン参加者向けの最小 starter です。
-「まず 1 つ skill を形にして提出する」ための土台として使えます。
+- 「PostgreSQL の論理レプリケーションとストリーミング複製の違いを tech-deep-dive で調べて。導入判断に使う。」
+- 「〇〇の技術深掘りして。公式ドキュメントと実装例を重視して。」
 
-### tech-deep-dive
+**調査済みフォルダから記事化（`tech-content-gen`）**
 
-技術テーマのマルチソース調査・分析・コンテンツ生成を行う 3 スキルセットです。
-単体でも組み合わせでも使用できます。
+- 「`research/2025-03-21_postgresql-replication/` の結果を元に、tech-content-gen でブログとチュートリアルとスライドを作って。」
+- パス省略時は **最新の `research/`** が選ばれるため、複数テーマがある場合は **必ずフォルダを指定**する。
 
-| Skill | 内容 |
-|-------|------|
-| `tech-deep-dive` | arXiv・GitHub・技術ブログ等を横断調査し、技術理解レポート・実装ガイド・コードサンプルを生成 |
-| `tech-content-gen` | 調査結果を元にブログ記事・チュートリアル・プレゼンスライドを生成 |
-| `tech-research-suite` | 上記 2 つを順番に実行し、6 成果物を一括生成するオーケストレーター |
+**一括（`tech-research-suite`）**
 
-## Repository Structure
+- 「GraphQL の N+1 と DataLoader についてフルリサーチして。社内勉強会用の資料まで欲しい。」
+
+**Cursor 等の別クライアント**
+
+- プラグインではなく **リポジトリの `plugins/tech-deep-dive/skills/` をエージェントのスキルとして読み込む**運用の場合も、上記と同様にテーマ・目的・（任意で）出力フォルダを指示してください。
+
+## ディレクトリ構成（本 plugin）
 
 ```text
-.claude-plugin/
-└── marketplace.json
-
-plugins/
-├── hackathon-starter/
-│   ├── .claude-plugin/
-│   │   └── plugin.json
-│   └── skills/
-│       └── starter-guide/
-│           └── SKILL.md
-└── tech-deep-dive/
-    ├── .claude-plugin/
-    │   └── plugin.json
-    └── skills/
-        ├── tech-deep-dive/
-        │   ├── SKILL.md
-        │   └── references/
-        ├── tech-content-gen/
-        │   ├── SKILL.md
-        │   └── references/
-        └── tech-research-suite/
-            └── SKILL.md
+plugins/tech-deep-dive/
+├── .claude-plugin/
+│   └── plugin.json
+└── skills/
+    ├── tech-deep-dive/
+    │   ├── SKILL.md
+    │   └── references/
+    ├── tech-content-gen/
+    │   ├── SKILL.md
+    │   └── references/
+    └── tech-research-suite/
+        └── SKILL.md
 ```
 
 ## License
