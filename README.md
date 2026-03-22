@@ -37,6 +37,16 @@
 /plugin install tech-deep-dive@deep-dive-lab
 ```
 
+## セットアップ
+
+初回実行時に依存モジュール（Playwright、requests、beautifulsoup4など）が自動的にインストールされます。手動セットアップは不要です。
+
+**手動インストール（オプション）:**
+```bash
+python scripts/install_deps.py       # Python依存をインストール
+npm install --prefix scripts/         # Node.js依存をインストール
+```
+
 ## ディレクトリ構成
 
 ```text
@@ -47,7 +57,11 @@ plugins/tech-deep-dive/
     └── tech-deep-dive/
         ├── SKILL.md
         ├── scripts/
-        │   └── html2pptx.js
+        │   ├── install_deps.py        # 依存管理スクリプト
+        │   ├── requirements.txt       # Python依存定義
+        │   ├── package.json          # Node.js依存定義
+        │   ├── html2pptx.js          # スライド生成スクリプト
+        │   └── verify_samples.py     # コード検証スクリプト
         └── references/
             ├── report_template.md
             ├── implementation_guide_template.md
@@ -55,7 +69,8 @@ plugins/tech-deep-dive/
             ├── evaluation_heuristics.md
             ├── blog_template.md
             ├── tutorial_template.md
-            └── slides_guide.md
+            ├── slides_guide.md
+            └── verification_guide.md
 ```
 
 ## License

@@ -17,6 +17,27 @@
   検証レポートを verification_report.md として出力先ディレクトリに生成する。
 """
 
+# 依存モジュール自動インストール
+import subprocess as _subprocess
+import sys as _sys
+from pathlib import Path as _Path
+
+def _ensure_dependencies():
+    """依存モジュールが未インストールならインストール"""
+    script_dir = _Path(__file__).parent
+    requirements_file = script_dir / 'requirements.txt'
+    if requirements_file.exists():
+        try:
+            _subprocess.check_call(
+                [_sys.executable, '-m', 'pip', 'install', '-q', '-r', str(requirements_file)],
+                stdout=_subprocess.DEVNULL,
+                stderr=_subprocess.DEVNULL
+            )
+        except Exception:
+            pass  # インストール失敗時も続行
+
+_ensure_dependencies()
+
 import argparse
 import json
 import os

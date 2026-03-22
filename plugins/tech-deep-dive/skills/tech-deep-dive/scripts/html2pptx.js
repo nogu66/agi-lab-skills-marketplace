@@ -13,6 +13,28 @@
 const path = require('path');
 const fs = require('fs');
 
+// 依存モジュール自動インストール
+function ensureDependencies() {
+  const { execSync } = require('child_process');
+  const packageJsonPath = path.join(__dirname, 'package.json');
+
+  if (fs.existsSync(packageJsonPath)) {
+    try {
+      const nodeModulesPath = path.join(__dirname, 'node_modules');
+      if (!fs.existsSync(nodeModulesPath)) {
+        console.log('依存モジュールをインストール中...');
+        execSync('npm install --quiet', { cwd: __dirname, stdio: 'pipe' });
+        console.log('✓ 依存モジュールをインストールしました');
+      }
+    } catch (error) {
+      console.error('警告: 依存モジュールのインストールに失敗しました');
+      // インストール失敗時も続行（グローバルインストールが存在するかもしれない）
+    }
+  }
+}
+
+ensureDependencies();
+
 // グローバルインストールのモジュールも解決できるようにする
 function requireModule(name) {
   try {

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python3:*)",
       "WebFetch(domain:arxiv.org)",
-      "WebFetch(domain:spring.io)"
+      "WebFetch(domain:spring.io)",
+      "WebSearch"
     ]
   }
 }

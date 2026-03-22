@@ -1,0 +1,10 @@
+{
+  "name": "tech-deep-dive-scripts",
+  "version": "1.0.0",
+  "description": "Tech Deep Dive スキルの補助スクリプト依存関係",
+  "private": true,
+  "dependencies": {
+    "playwright": ">=1.40.0",
+    "pptxgenjs": ">=3.11.0"
+  }
+}
