@@ -37,12 +37,23 @@ ensureDependencies();
 
 // グローバルインストールのモジュールも解決できるようにする
 function requireModule(name) {
+  // まずローカルパッケージを試す
   try {
     return require(name);
-  } catch {
-    const globalRoot = require('child_process')
-      .execSync('npm root -g', { encoding: 'utf8' }).trim();
-    return require(path.join(globalRoot, name));
+  } catch (e) {
+    // ローカルが失敗したら、スクリプトディレクトリの node_modules を試す
+    try {
+      return require(path.join(__dirname, 'node_modules', name));
+    } catch {
+      // それでも失敗したらグローバルを試す
+      try {
+        const { execSync } = require('child_process');
+        const globalRoot = execSync('npm root -g', { encoding: 'utf8' }).trim();
+        return require(path.join(globalRoot, name));
+      } catch (globalError) {
+        throw new Error(`モジュール '${name}' が見つかりません。以下を実行してください:\npython ${path.join(__dirname, 'install_deps.py')}`);
+      }
+    }
   }
 }
 
@@ -62,16 +73,34 @@ async function main() {
 
   const absSlidesDir = path.resolve(slidesDir);
   if (!fs.existsSync(absSlidesDir)) {
-    console.error(`ディレクトリが見つかりません: ${absSlidesDir}`);
+    console.error(`エラー: スライドディレクトリが見つかりません: ${absSlidesDir}`);
     process.exit(1);
+  }
+
+  // 出力先ディレクトリの作成確認
+  const absOutput = path.resolve(outputPath);
+  const outputDir = path.dirname(absOutput);
+  if (!fs.existsSync(outputDir)) {
+    try {
+      fs.mkdirSync(outputDir, { recursive: true });
+      console.log(`出力ディレクトリを作成しました: ${outputDir}`);
+    } catch (err) {
+      console.error(`エラー: 出力ディレクトリを作成できません: ${err.message}`);
+      process.exit(1);
+    }
   }
 
   // HTML スライドファイルを番号順に取得
   const slideFiles = fs.readdirSync(absSlidesDir)
-    .filter(f => /^slide[_-]?\d+\.html$/i.test(f))
+    .filter(f => {
+      const match = /^slide[_-]?(\d+)\.html$/i.test(f);
+      return match;
+    })
     .sort((a, b) => {
-      const numA = parseInt(a.match(/\d+/)[0], 10);
-      const numB = parseInt(b.match(/\d+/)[0], 10);
+      const matchA = a.match(/(\d+)/);
+      const matchB = b.match(/(\d+)/);
+      const numA = matchA ? parseInt(matchA[1], 10) : 0;
+      const numB = matchB ? parseInt(matchB[1], 10) : 0;
       return numA - numB;
     });
 
@@ -83,8 +112,18 @@ async function main() {
   console.log(`${slideFiles.length} 枚の HTML スライドを検出`);
 
   // モジュール読み込み
-  const { chromium } = requireModule('playwright');
+  const playwright = requireModule('playwright');
+  const { chromium } = playwright;
   const PptxGenJS = requireModule('pptxgenjs');
+
+  // Playwright ブラウザのインストール確認（初回実行時）
+  try {
+    console.log('Playwright ブラウザをチェック中...');
+    await playwright.chromium.executablePath();
+  } catch {
+    console.log('Playwright ブラウザをインストール中...');
+    await chromium.downloadBrowserIfNeeded?.();
+  }
 
   // Playwright 起動
   const browser = await chromium.launch({ headless: true });
@@ -103,7 +142,13 @@ async function main() {
 
     const page = await context.newPage();
     const htmlPath = path.join(absSlidesDir, file);
-    await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle', timeout: 30000 });
+    try {
+      await page.goto(`file://${htmlPath}`, { waitUntil: 'load', timeout: 30000 });
+    } catch (err) {
+      console.error(`エラー: ${file} の読み込みに失敗: ${err.message}`);
+      await page.close();
+      throw err;
+    }
 
     // スクリーンショットを Base64 で取得
     const buf = await page.screenshot({ type: 'png' });
@@ -122,12 +167,43 @@ async function main() {
   await browser.close();
 
   // 保存
-  const absOutput = path.resolve(outputPath);
-  await pptx.writeFile({ fileName: absOutput });
-  console.log(`生成完了: ${absOutput}`);
+  try {
+    // PptxGenJS のバージョン互換性対応
+    if (typeof pptx.writeFile === 'function') {
+      await pptx.writeFile({ fileName: absOutput });
+    } else if (typeof pptx.save === 'function') {
+      await pptx.save({ fileName: absOutput });
+    } else {
+      throw new Error('PptxGenJS の保存メソッドが見つかりません');
+    }
+
+    // ファイルが実際に生成されたか確認
+    if (fs.existsSync(absOutput)) {
+      const stats = fs.statSync(absOutput);
+      console.log(`生成完了: ${absOutput} (${stats.size} バイト)`);
+    } else {
+      throw new Error(`ファイルが生成されませんでした: ${absOutput}`);
+    }
+  } catch (err) {
+    console.error(`エラー: PPTX ファイルの生成に失敗: ${err.message}`);
+    throw err;
+  }
 }
 
 main().catch(err => {
+  console.error('\n❌ PPTX 生成に失敗しました');
   console.error('エラー:', err.message);
+
+  // スタックトレースは詳細には出力しない（ただし DEBUG=1 の場合は出力）
+  if (process.env.DEBUG === '1') {
+    console.error('\nスタックトレース:');
+    console.error(err.stack);
+  }
+
+  console.error('\n対処方法:');
+  console.error('1. 依存モジュールをインストール: python scripts/install_deps.py');
+  console.error('2. スライドディレクトリが存在することを確認');
+  console.error('3. slide_*.html ファイルが存在することを確認');
+
   process.exit(1);
 });

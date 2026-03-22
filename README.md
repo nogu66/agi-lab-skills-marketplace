@@ -2,7 +2,43 @@
 
 技術テーマのマルチソース調査から、レポート・実装ガイド・コードサンプル・ブログ記事・チュートリアル・スライドまで一括生成する統合スキル。
 
+## Requirements（必要環境）
+
+- **Python**: 3.9以上
+- **Node.js**: 18.0以上
+- **npm**: 9.0以上
+- **Claude Code**: 最新版
+
+## インストール
+
+### 前提条件の確認
+
+```bash
+# Python バージョンの確認
+python --version  # 3.9以上であることを確認
+
+# Node.js バージョンの確認
+node --version    # 18.0以上であることを確認
+npm --version     # 9.0以上であることを確認
+```
+
+### Claude Code マーケットプレイス経由でのインストール
+
+```bash
+/plugin marketplace add <owner>/<repo>
+/plugin install tech-deep-dive@deep-dive-lab
+```
+
+### ローカルからのインストール
+
+```bash
+cd /path/to/agi-lab-skills-marketplace
+/plugin install ./plugins/tech-deep-dive
+```
+
 ## 使い方
+
+### 基本的な使い方
 
 | やりたいこと | 言い方の例 |
 |---|---|
@@ -10,7 +46,7 @@
 | レポート系だけ | 「レポートだけ欲しい」「コードサンプルだけ」 |
 | 既存調査からコンテンツ生成 | 「調査結果をブログにして」「スライドにまとめて」 |
 
-**プロンプトに含めるとよいこと（任意）**
+### プロンプトに含めるとよい情報（任意）
 
 - **テーマ**: 何について知りたいか（例: 「Rust の async ランタイム比較」）
 - **目的**: キャッチアップ / 導入判断 / 勉強会資料 など
@@ -30,21 +66,32 @@
 | B: コンテンツ | `tutorial.md` | チュートリアル (2,000〜4,000語) |
 | B: コンテンツ | `presentation.pptx` | スライド (15〜25枚) |
 
-## インストール
-
-```bash
-/plugin marketplace add <owner>/<repo>
-/plugin install tech-deep-dive@deep-dive-lab
-```
-
 ## セットアップ
+
+### 自動セットアップ
 
 初回実行時に依存モジュール（Playwright、requests、beautifulsoup4など）が自動的にインストールされます。手動セットアップは不要です。
 
-**手動インストール（オプション）:**
+### 手動セットアップ（オプション）
+
+依存関係を明示的にインストールしたい場合：
+
 ```bash
-python scripts/install_deps.py       # Python依存をインストール
-npm install --prefix scripts/         # Node.js依存をインストール
+# Python依存のインストール
+python scripts/install_deps.py
+
+# または個別にインストール
+pip install -r scripts/requirements.txt
+
+# Node.js依存のインストール
+npm install --prefix scripts/
+```
+
+### インストール後の確認
+
+```bash
+# セットアップが完了したか確認
+python scripts/verify_samples.py
 ```
 
 ## ディレクトリ構成
@@ -73,6 +120,58 @@ plugins/tech-deep-dive/
             └── verification_guide.md
 ```
 
+## トラブルシューティング
+
+### 依存関係がインストールできない
+
+```bash
+# キャッシュをクリアしてリトライ
+pip cache purge
+npm cache clean --force
+
+# 再度セットアップを実行
+python scripts/install_deps.py
+```
+
+### Python バージョンエラー
+
+```bash
+# 複数の Python がインストールされている場合は明示的にバージョンを指定
+python3.9 -m pip install -r scripts/requirements.txt
+```
+
+### Playwright のインストール失敗
+
+```bash
+# Playwright のブラウザをインストール
+playwright install
+```
+
+## Development
+
+このプロジェクトに貢献したい場合：
+
+1. リポジトリを Fork する
+2. 機能ブランチを作成: `git checkout -b feature/amazing-feature`
+3. 変更をコミット: `git commit -m 'Add amazing feature'`
+4. ブランチに Push: `git push origin feature/amazing-feature`
+5. Pull Request を作成する
+
+### 開発環境の構築
+
+```bash
+# 開発用依存関係をインストール
+pip install -e .
+npm install --prefix scripts/
+
+# テストを実行
+python scripts/verify_samples.py
+```
+
 ## License
 
 MIT
+
+## Support
+
+問題が発生した場合は、[GitHub Issues](https://github.com/<owner>/<repo>/issues) で報告してください。
